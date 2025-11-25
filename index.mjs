@@ -33,6 +33,16 @@ export default class WhiteListAgent {
       next();
     });
 
+    // Serve icon
+    router.get('/icon.svg', (req, res) => {
+      const iconPath = path.join(__dirname, 'icon.svg');
+      if (!existsSync(iconPath)) {
+        return res.status(404).send('Icon not found');
+      }
+      res.set('Content-Type', 'image/svg+xml');
+      res.sendFile(iconPath);
+    });
+
     // Serve client.js for publishers
     router.get('/client.js', (req, res) => {
       const clientPath = path.join(__dirname, 'client/client.js');

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Shield background -->
+  <path d="M50 5 L85 20 L85 45 Q85 75 50 95 Q15 75 15 45 L15 20 Z"
+        fill="#4A90E2"
+        stroke="#2E5C8A"
+        stroke-width="2"/>
+
+  <!-- Checkmark -->
+  <path d="M35 50 L45 62 L70 35"
+        fill="none"
+        stroke="#FFFFFF"
+        stroke-width="6"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Small lock accent (top right) -->
+  <g transform="translate(65, 15)">
+    <rect x="0" y="5" width="10" height="8" rx="1" fill="#FFD700" stroke="#FFA500" stroke-width="0.5"/>
+    <path d="M2 5 L2 3 Q2 1 5 1 Q8 1 8 3 L8 5"
+          fill="none"
+          stroke="#FFA500"
+          stroke-width="1.5"/>
+  </g>
+</svg>

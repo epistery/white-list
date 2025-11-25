@@ -2,7 +2,9 @@
   "name": "@epistery/white-list",
   "version": "0.1.0",
   "description": "On-chain access control with rivet delegation",
+  "author": "Epistery",
   "main": "index.mjs",
+  "icon": "/agent/epistery/white-list/icon.svg",
   "permissions": [
     "whitelist:read",
     "whitelist:write",
