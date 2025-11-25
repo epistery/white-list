@@ -1,0 +1,20 @@
+{
+  "name": "white-list",
+  "version": "0.1.0",
+  "description": "On-chain access control with rivet delegation. Publishers control who can access their sites using Ethereum addresses.",
+  "author": "Epistery",
+  "entrypoint": "server/index.mjs",
+  "clientScript": "client/client.js",
+  "routes": {
+    "/check": "Check if current rivet is whitelisted",
+    "/list": "Get all whitelisted addresses (admin only)",
+    "/delegate": "Create delegation token for sister domains"
+  },
+  "permissions": [
+    "whitelist:read",
+    "whitelist:write",
+    "delegation:create"
+  ],
+  "requiresAuth": true,
+  "supportsSubdomainDelegation": true
+}

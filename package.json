@@ -1,0 +1,30 @@
+{
+  "name": "@epistery/white-list",
+  "version": "0.1.0",
+  "description": "Epistery white-list agent - On-chain access control with rivet delegation",
+  "type": "module",
+  "main": "server/index.mjs",
+  "scripts": {
+    "dev": "node server/index.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "keywords": [
+    "epistery",
+    "agent",
+    "whitelist",
+    "access-control",
+    "web3"
+  ],
+  "author": "Epistery",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/epistery/white-list.git"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "peerDependencies": {
+    "epistery": "*"
+  }
+}
