@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>White-List Admin</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #4A90E2 0%, #2E5C8A 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0 0 10px 0;
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .header .stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 20px;
+    }
+
+    .stat-box {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 36px;
+      font-weight: bold;
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-top: 5px;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .section h2 {
+      margin: 0 0 15px 0;
+      font-size: 20px;
+      color: #333;
+      border-bottom: 2px solid #4A90E2;
+      padding-bottom: 10px;
+    }
+
+    .add-form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .add-form input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: monospace;
+      transition: border-color 0.2s;
+    }
+
+    .add-form input:focus {
+      outline: none;
+      border-color: #4A90E2;
+    }
+
+    .add-form button {
+      padding: 12px 24px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .add-form button:hover {
+      background: #218838;
+    }
+
+    .add-form button:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+    }
+
+    .members-list {
+      background: #f8f9fa;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .member-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      border-bottom: 1px solid #e0e0e0;
+      transition: background 0.2s;
+    }
+
+    .member-item:last-child {
+      border-bottom: none;
+    }
+
+    .member-item:hover {
+      background: #f0f0f0;
+    }
+
+    .member-address {
+      font-family: monospace;
+      font-size: 14px;
+      color: #495057;
+      flex: 1;
+      word-break: break-all;
+    }
+
+    .member-actions button {
+      padding: 6px 12px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .member-actions button:hover {
+      background: #c82333;
+    }
+
+    .member-actions button:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+    }
+
+    .message {
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .message.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .access-denied {
+      text-align: center;
+      padding: 60px 30px;
+    }
+
+    .access-denied-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .access-denied h2 {
+      color: #dc3545;
+      margin: 0 0 10px 0;
+    }
+
+    .access-denied p {
+      color: #6c757d;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔐 White-List Admin</h1>
+      <div class="stats">
+        <div class="stat-box">
+          <span id="member-count" class="stat-number">-</span>
+          <span class="stat-label">Members</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div id="loading-state" class="loading">
+        Loading...
+      </div>
+
+      <div id="access-denied-state" style="display: none;">
+        <div class="access-denied">
+          <div class="access-denied-icon">🚫</div>
+          <h2>Access Denied</h2>
+          <p>You don't have admin permissions for this white-list.</p>
+        </div>
+      </div>
+
+      <div id="admin-content" style="display: none;">
+        <div id="message-container"></div>
+
+        <div class="section">
+          <h2>Add Member</h2>
+          <div class="add-form">
+            <input type="text" id="add-address-input" placeholder="0x..." />
+            <button id="add-button">Add Member</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Members</h2>
+          <div id="members-list" class="members-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    let membersList = [];
+
+    async function checkAccess() {
+      try {
+        const response = await fetch('/agent/epistery/white-list/check', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        return data.allowed;
+      } catch (error) {
+        console.error('Access check failed:', error);
+        return false;
+      }
+    }
+
+    async function loadMembers() {
+      try {
+        const response = await fetch('/agent/epistery/white-list/list', {
+          credentials: 'include'
+        });
+
+        if (response.status === 403) {
+          showAccessDenied();
+          return;
+        }
+
+        const data = await response.json();
+
+        if (data.whitelist) {
+          membersList = data.whitelist;
+          renderMembers();
+          updateMemberCount();
+          showAdminContent();
+        } else if (data.error) {
+          showMessage(data.error, 'error');
+        }
+      } catch (error) {
+        showMessage('Failed to load members: ' + error.message, 'error');
+      }
+    }
+
+    function renderMembers() {
+      const container = document.getElementById('members-list');
+
+      if (membersList.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">👥</div>
+            <p>No members yet. Add the first member above.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = membersList.map(address => `
+        <div class="member-item">
+          <div class="member-address">${address}</div>
+          <div class="member-actions">
+            <button onclick="removeMember('${address}')">Remove</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateMemberCount() {
+      document.getElementById('member-count').textContent = membersList.length;
+    }
+
+    async function addMember() {
+      const input = document.getElementById('add-address-input');
+      const button = document.getElementById('add-button');
+      const address = input.value.trim();
+
+      if (!address) {
+        showMessage('Please enter an address', 'error');
+        return;
+      }
+
+      if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+        showMessage('Invalid Ethereum address format', 'error');
+        return;
+      }
+
+      if (membersList.includes(address)) {
+        showMessage('Address is already a member', 'error');
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = 'Adding...';
+
+      try {
+        const response = await fetch('/agent/epistery/white-list/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({ address })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          membersList.push(address);
+          renderMembers();
+          updateMemberCount();
+          input.value = '';
+          showMessage(`Added ${address}`, 'success');
+        } else {
+          showMessage(data.error || 'Failed to add member', 'error');
+        }
+      } catch (error) {
+        showMessage('Failed to add member: ' + error.message, 'error');
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Add Member';
+      }
+    }
+
+    window.removeMember = async function(address) {
+      if (!confirm(`Remove ${address} from whitelist?`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/agent/epistery/white-list/remove', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({ address })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          membersList = membersList.filter(a => a !== address);
+          renderMembers();
+          updateMemberCount();
+          showMessage(`Removed ${address}`, 'success');
+        } else {
+          showMessage(data.error || 'Failed to remove member', 'error');
+        }
+      } catch (error) {
+        showMessage('Failed to remove member: ' + error.message, 'error');
+      }
+    };
+
+    function showMessage(text, type = 'info') {
+      const container = document.getElementById('message-container');
+      const messageEl = document.createElement('div');
+      messageEl.className = `message ${type}`;
+      messageEl.textContent = text;
+      container.appendChild(messageEl);
+
+      setTimeout(() => {
+        messageEl.remove();
+      }, 5000);
+    }
+
+    function showAdminContent() {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('access-denied-state').style.display = 'none';
+      document.getElementById('admin-content').style.display = 'block';
+    }
+
+    function showAccessDenied() {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('admin-content').style.display = 'none';
+      document.getElementById('access-denied-state').style.display = 'block';
+    }
+
+    // Event listeners
+    document.getElementById('add-button').addEventListener('click', addMember);
+    document.getElementById('add-address-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        addMember();
+      }
+    });
+
+    // Initialize
+    loadMembers();
+  </script>
+</body>
+</html>

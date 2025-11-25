@@ -43,6 +43,24 @@ export default class WhiteListAgent {
       res.sendFile(iconPath);
     });
 
+    // Serve widget (for agent box)
+    router.get('/widget', (req, res) => {
+      const widgetPath = path.join(__dirname, 'client/widget.html');
+      if (!existsSync(widgetPath)) {
+        return res.status(404).send('Widget not found');
+      }
+      res.sendFile(widgetPath);
+    });
+
+    // Serve admin page
+    router.get('/admin', (req, res) => {
+      const adminPath = path.join(__dirname, 'client/admin.html');
+      if (!existsSync(adminPath)) {
+        return res.status(404).send('Admin page not found');
+      }
+      res.sendFile(adminPath);
+    });
+
     // Serve client.js for publishers
     router.get('/client.js', (req, res) => {
       const clientPath = path.join(__dirname, 'client/client.js');
@@ -122,6 +140,108 @@ export default class WhiteListAgent {
       } catch (error) {
         console.error('[white-list] List error:', error);
         res.status(500).json({
+          error: error.message
+        });
+      }
+    });
+
+    // Add member endpoint (admin only)
+    router.post('/add', async (req, res) => {
+      try {
+        const verification = await this.verifyDelegationToken(req);
+
+        if (!verification.valid) {
+          return res.status(401).json({
+            success: false,
+            error: verification.error
+          });
+        }
+
+        // Check if user has admin scope
+        if (!verification.scope?.includes('whitelist:admin')) {
+          return res.status(403).json({
+            success: false,
+            error: 'Insufficient permissions - requires whitelist:admin scope'
+          });
+        }
+
+        const { address } = req.body;
+
+        if (!address || !/^0x[a-fA-F0-9]{40}$/.test(address)) {
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid Ethereum address'
+          });
+        }
+
+        if (!this.epistery) {
+          return res.status(500).json({
+            success: false,
+            error: 'Epistery not initialized'
+          });
+        }
+
+        await this.epistery.addToWhitelist(address);
+
+        res.json({
+          success: true,
+          address: address
+        });
+      } catch (error) {
+        console.error('[white-list] Add error:', error);
+        res.status(500).json({
+          success: false,
+          error: error.message
+        });
+      }
+    });
+
+    // Remove member endpoint (admin only)
+    router.post('/remove', async (req, res) => {
+      try {
+        const verification = await this.verifyDelegationToken(req);
+
+        if (!verification.valid) {
+          return res.status(401).json({
+            success: false,
+            error: verification.error
+          });
+        }
+
+        // Check if user has admin scope
+        if (!verification.scope?.includes('whitelist:admin')) {
+          return res.status(403).json({
+            success: false,
+            error: 'Insufficient permissions - requires whitelist:admin scope'
+          });
+        }
+
+        const { address } = req.body;
+
+        if (!address || !/^0x[a-fA-F0-9]{40}$/.test(address)) {
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid Ethereum address'
+          });
+        }
+
+        if (!this.epistery) {
+          return res.status(500).json({
+            success: false,
+            error: 'Epistery not initialized'
+          });
+        }
+
+        await this.epistery.removeFromWhitelist(address);
+
+        res.json({
+          success: true,
+          address: address
+        });
+      } catch (error) {
+        console.error('[white-list] Remove error:', error);
+        res.status(500).json({
+          success: false,
           error: error.message
         });
       }
