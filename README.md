@@ -36,9 +36,9 @@ Publisher's Site (mydomain.com)
 
 ## Publisher Integration
 
-### Pattern 1: Ad-Supported Site (Passive Mode)
+### Passive Mode
 
-**Use case:** Free content with ads, no login required, delegation only when accessing premium features.
+**Use case:** Free content, no login required, delegation only when accessing premium features.
 
 ```html
 <!-- In your site's <head> -->
@@ -67,9 +67,11 @@ window.addEventListener('epistery:access-granted', (e) => {
 });
 ```
 
-### Pattern 2: Members-Only Site (Required Mode)
+### Pattern 2: access control mode
 
 **Use case:** Private site, all content requires whitelist membership.
+
+Could be open access, but user acknowledges they have asserted an anonymous identity. Can be used with Epistery notabot points to good effect.
 
 ```html
 <!-- In your site's <head> -->
