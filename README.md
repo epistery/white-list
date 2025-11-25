@@ -1,6 +1,6 @@
 # Epistery White-List Agent
 
-On-chain access control for websites using Ethereum addresses and rivet delegation.
+On-chain access control for websites using Ethereum addresses and epistery delegation.
 
 ## Overview
 
