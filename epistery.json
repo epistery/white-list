@@ -5,6 +5,7 @@
   "author": "Epistery",
   "main": "index.mjs",
   "icon": "/agent/epistery/white-list/icon.svg",
+  "widget": "/agent/epistery/white-list/widget",
   "permissions": [
     "whitelist:read",
     "whitelist:write",
