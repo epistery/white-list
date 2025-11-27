@@ -83,6 +83,19 @@ export default class WhiteListAgent {
           });
         }
 
+        // Development mode: allow all addresses for localhost
+        const isLocalhost = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
+
+        if (isLocalhost) {
+          console.log('[white-list] Dev mode: allowing all addresses for localhost');
+          return res.json({
+            allowed: true,
+            address: verification.rivetAddress,
+            domain: verification.domain,
+            devMode: true
+          });
+        }
+
         // Check if rivet is whitelisted using epistery's whitelist functionality
         if (!this.epistery) {
           return res.status(500).json({
@@ -100,6 +113,22 @@ export default class WhiteListAgent {
         });
       } catch (error) {
         console.error('[white-list] Check error:', error);
+
+        // Development mode fallback: if contract not configured and localhost, allow
+        const isLocalhost = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
+        if (isLocalhost && error.message.includes('Agent contract address not configured')) {
+          console.log('[white-list] Dev mode fallback: contract not configured, allowing for localhost');
+
+          const verification = await this.verifyDelegationToken(req);
+          return res.json({
+            allowed: true,
+            address: verification.rivetAddress,
+            domain: verification.domain,
+            devMode: true,
+            note: 'Contract not configured - using dev mode'
+          });
+        }
+
         res.status(500).json({
           allowed: false,
           error: error.message

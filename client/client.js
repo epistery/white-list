@@ -101,9 +101,24 @@
   /**
    * Get epistery subdomain from current hostname
    * e.g., mydomain.com → epistery.mydomain.com
+   * For localhost, use the host running epistery-host
    */
   function getEpisterySubdomain() {
     const hostname = window.location.hostname;
+
+    // For localhost development, use the epistery-host directly
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      // Extract port from the script src that loaded this file
+      const scripts = document.getElementsByTagName('script');
+      for (let script of scripts) {
+        if (script.src && script.src.includes('/agent/epistery/white-list/client.js')) {
+          const url = new URL(script.src);
+          return url.host; // e.g., 'localhost:4080'
+        }
+      }
+      // Fallback to default epistery-host port
+      return 'localhost:4080';
+    }
 
     // If already on epistery subdomain, return as-is
     if (hostname.startsWith('epistery.')) {
@@ -169,8 +184,11 @@
     const scope = encodeURIComponent(JSON.stringify(['whitelist:read']));
     const domain = encodeURIComponent(window.location.hostname);
 
+    // Use http for localhost, https for production
+    const protocol = EPISTERY_SUBDOMAIN.includes('localhost') ? 'http' : 'https';
+
     const delegationUrl =
-      `https://${EPISTERY_SUBDOMAIN}/delegate?` +
+      `${protocol}://${EPISTERY_SUBDOMAIN}/delegate?` +
       `return=${returnUrl}&` +
       `scope=${scope}&` +
       `domain=${domain}`;
@@ -184,8 +202,11 @@
    */
   async function checkAccess(token) {
     try {
+      // Use http for localhost, https for production
+      const protocol = EPISTERY_SUBDOMAIN.includes('localhost') ? 'http' : 'https';
+
       const response = await fetch(
-        `https://${EPISTERY_SUBDOMAIN}/agent/white-list/check`,
+        `${protocol}://${EPISTERY_SUBDOMAIN}/agent/epistery/white-list/check`,
         {
           method: 'GET',
           headers: {
